@@ -6,7 +6,7 @@ from agents import orchestrator
 # 1. Page Configuration
 st.set_page_config(page_title="Horizon Campus AI Advisor", page_icon="🎓", layout="centered", initial_sidebar_state="expanded")
 
-# 2. Premium Custom CSS
+# 2. Precise Custom CSS for the Exact Look in the Image
 st.markdown("""
     <style>
     /* Hide Streamlit default headers and footers */
@@ -14,12 +14,12 @@ st.markdown("""
     header {visibility: hidden;}
     footer {visibility: hidden;}
     
-    /* App Background & Theme */
+    /* Deep Dark Purple Aurora Background */
     .stApp {
-        background-color: #0f172a !important;
+        background-color: #0b0714 !important;
         background-image: 
-            radial-gradient(ellipse at 50% 0%, rgba(30, 58, 138, 0.3) 0%, transparent 70%),
-            radial-gradient(ellipse at 50% 100%, rgba(15, 23, 42, 0.9) 0%, transparent 100%) !important;
+            radial-gradient(ellipse at 50% 0%, rgba(120, 40, 230, 0.22) 0%, transparent 60%),
+            radial-gradient(ellipse at 50% 100%, rgba(70, 20, 130, 0.18) 0%, transparent 50%) !important;
         background-attachment: fixed;
         color: #f8fafc;
     }
@@ -39,7 +39,7 @@ st.markdown("""
     }
     .hero-subtitle {
         font-size: 1rem;
-        color: #94a3b8;
+        color: #c4b5fd;
         margin-top: 5px;
         margin-bottom: 10px;
         font-weight: 400;
@@ -47,57 +47,65 @@ st.markdown("""
 
     /* Modern Rounded Corners for Images */
     .stImage img {
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        border-radius: 14px;
+        box-shadow: 0 10px 25px rgba(76, 29, 149, 0.3);
+        border: 1px solid rgba(139, 92, 246, 0.2);
     }
 
-    /* Glassmorphism Chat Input */
+    /* Exact Pill-Shaped Glowing Chat Input Match */
     [data-testid="stChatInput"] {
         padding-bottom: 1.5rem;
     }
     [data-testid="stChatInput"] > div {
-        background: rgba(30, 41, 59, 0.7) !important;
-        border: 1px solid rgba(59, 130, 246, 0.3) !important;
-        border-radius: 16px !important;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3) !important;
-        backdrop-filter: blur(10px) !important;
-        padding: 4px;
+        background: rgba(20, 12, 35, 0.85) !important;
+        border: 1px solid rgba(168, 85, 247, 0.5) !important;
+        border-radius: 35px !important;
+        box-shadow: 0 0 25px rgba(139, 92, 246, 0.25) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        padding: 6px 14px !important;
+        transition: all 0.3s ease;
+    }
+    [data-testid="stChatInput"] > div:focus-within {
+        border: 1px solid rgba(192, 132, 252, 0.9) !important;
+        box-shadow: 0 0 30px rgba(168, 85, 247, 0.4) !important;
     }
     [data-testid="stChatInput"] textarea {
         color: #f8fafc !important;
         font-size: 1rem;
     }
 
-    /* Chat Messages */
+    /* Chat Message Bubbles matching the image style */
     .stChatMessage {
-        background-color: rgba(30, 41, 59, 0.5) !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        border-radius: 14px !important;
-        backdrop-filter: blur(8px) !important;
-        margin-bottom: 12px;
+        background-color: rgba(30, 18, 55, 0.5) !important;
+        border: 1px solid rgba(168, 85, 247, 0.2) !important;
+        border-radius: 16px !important;
+        backdrop-filter: blur(12px) !important;
+        margin-bottom: 14px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     }
 
     /* Sidebar Styling */
     [data-testid="stSidebar"] {
-        background-color: #090d16 !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        background-color: #07040f !important;
+        border-right: 1px solid rgba(139, 92, 246, 0.1);
     }
     [data-testid="stSidebar"] * {
         color: #e2e8f0 !important;
     }
     
-    /* Action Button */
+    /* Action Button with Violet Gradient */
     .stButton>button {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+        background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
         border-radius: 10px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(167, 139, 250, 0.3) !important;
         color: white !important;
         font-weight: 700;
         transition: all 0.3s ease;
     }
     .stButton>button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        box-shadow: 0 5px 15px rgba(124, 58, 237, 0.5);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -157,7 +165,7 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # 9. User Input Handling
-if user_query := st.chat_input("Ask about degree programs, library hours, or campus rules..."):
+if user_query := st.chat_input("Ask about degrees, campus rules, or library hours..."):
     st.chat_message("user", avatar="👤").markdown(user_query)
     st.session_state.messages.append({"role": "user", "content": user_query})
 
