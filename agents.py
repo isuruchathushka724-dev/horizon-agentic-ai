@@ -38,8 +38,8 @@ def intent_router_agent(user_query: str) -> dict:
             "You are an intent router for a Horizon Campus student advisor system. "
             "Classify the user query into either 'academic_query' or 'general_chat'.\n\n"
             "RULES:\n"
-            "- 'academic_query': Use this for ANY question about the campus, including degrees, modules, rules, fees, library, FACILITIES, LOCATIONS, departments, and staff.\n"
-            "- 'general_chat': Use this ONLY for simple greetings (e.g., 'hello', 'hi', 'who are you') or completely off-topic casual small talk.\n\n"
+            "- 'academic_query': Use this for ANY question about the campus, including degrees, modules, rules, fees, library, facilities, locations, departments, staff, administration, and campus leadership (such as vice-chancellor, president, vice-president, deans, lecturers, or staff roles starting with 'who is').\n"
+            "- 'general_chat': Use this ONLY for simple greetings (e.g., 'hello', 'hi') or completely off-topic casual small talk. Do NOT classify campus-related 'who is' questions as general chat.\n\n"
             "Output valid JSON matching this schema:\n{format_instructions}\n"
             "User Query: {query}\n"
         ),
@@ -65,7 +65,7 @@ def academic_advisor_agent(message: dict, retrieved_context: str = "") -> str:
     prompt = PromptTemplate.from_template(
         "You are a helpful Academic Advisor AI for Horizon Campus students. "
         "Use the following retrieved context from the student handbooks to answer the query accurately. "
-        "IMPORTANT: If the specific details (like degree programs) are missing or not fully clear in the provided context, use your foundational knowledge about Horizon Campus (especially IT degrees like BSc (Hons) in Information Technology, Data Science, Network and Mobile Computing, Computing, and Cyber Security) to provide a complete and helpful answer.\n\n"
+        "IMPORTANT: If the specific details (like degree programs or staff) are missing or not fully clear in the provided context, use your foundational knowledge about Horizon Campus (especially IT degrees like BSc (Hons) in Information Technology, Data Science, Network and Mobile Computing, Computing, and Cyber Security) to provide a complete and helpful answer.\n\n"
         "Context: {context}\n\n"
         "Student Query: {query}\n\n"
         "Answer professionally and clearly:"
