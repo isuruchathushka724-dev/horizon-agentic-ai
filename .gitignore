@@ -9,3 +9,8 @@ venv/
 # Python cache
 __pycache__/
 *.pyc
+
+chroma_db/
+__pycache__/
+.env
+venv/
