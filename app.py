@@ -4,9 +4,9 @@ from rag import initialize_vector_store, get_retriever
 from agents import orchestrator
 
 # 1. Page Configuration
-st.set_page_config(page_title="Horizon AI", page_icon="🎓", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Horizon Campus AI Advisor", page_icon="🎓", layout="centered", initial_sidebar_state="expanded")
 
-# 2. Premium "Dark Aurora" Custom CSS (Campus Context)
+# 2. Premium Custom CSS matching Horizon Campus Brand Colors
 st.markdown("""
     <style>
     /* Hide Streamlit default headers and footers */
@@ -14,114 +14,132 @@ st.markdown("""
     header {visibility: hidden;}
     footer {visibility: hidden;}
     
-    /* 1. Deep Dark Background with Purple/Magenta Aurora Glow */
+    /* App Background & Theme */
     .stApp {
-        background-color: #09090b !important;
+        background-color: #0f172a !important;
         background-image: 
-            radial-gradient(ellipse at 50% 0%, rgba(120, 40, 255, 0.25) 0%, transparent 60%),
-            radial-gradient(ellipse at 50% 100%, rgba(200, 20, 150, 0.15) 0%, transparent 50%) !important;
+            radial-gradient(ellipse at 50% 0%, rgba(30, 58, 138, 0.3) 0%, transparent 70%),
+            radial-gradient(ellipse at 50% 100%, rgba(15, 23, 42, 0.9) 0%, transparent 100%) !important;
         background-attachment: fixed;
-        color: white;
+        color: #f8fafc;
     }
 
-    /* 2. Main Center Title */
-    .hero-title {
+    /* Header Banner Styling */
+    .hero-container {
         text-align: center;
-        font-size: 2.8rem;
-        font-weight: 500;
-        letter-spacing: -0.02em;
-        color: #ffffff;
-        margin-top: 6vh;
-        margin-bottom: 0.2rem;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        padding: 20px 0;
     }
-    
-    /* 3. Subtitle */
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin-top: 10px;
+        margin-bottom: 0px;
+        letter-spacing: -0.02em;
+    }
     .hero-subtitle {
-        text-align: center;
-        font-size: 1.1rem;
-        color: #a1a1aa;
-        margin-bottom: 3rem;
+        font-size: 1.05rem;
+        color: #94a3b8;
+        margin-top: 5px;
+        margin-bottom: 25px;
         font-weight: 400;
     }
 
-    /* 4. Glassmorphism Chat Input Container */
+    /* Glassmorphism Chat Input */
     [data-testid="stChatInput"] {
-        padding-bottom: 2rem;
+        padding-bottom: 1.5rem;
     }
     [data-testid="stChatInput"] > div {
-        background: rgba(30, 10, 60, 0.4) !important;
-        border: 1px solid rgba(160, 80, 255, 0.4) !important;
-        border-radius: 20px !important;
-        box-shadow: 0 0 20px rgba(120, 50, 255, 0.15), inset 0 0 10px rgba(200, 50, 255, 0.1) !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
+        background: rgba(30, 41, 59, 0.7) !important;
+        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3) !important;
+        backdrop-filter: blur(10px) !important;
         padding: 4px;
-        transition: all 0.3s ease;
     }
-    [data-testid="stChatInput"] > div:focus-within {
-        border: 1px solid rgba(160, 80, 255, 0.8) !important;
-        box-shadow: 0 0 25px rgba(120, 50, 255, 0.3), inset 0 0 12px rgba(200, 50, 255, 0.2) !important;
-    }
-    
-    /* 5. Chat Input Text Color */
     [data-testid="stChatInput"] textarea {
         color: #f8fafc !important;
-        font-size: 1.05rem;
+        font-size: 1rem;
     }
 
-    /* 6. Chat Message Bubbles */
+    /* Chat Messages */
     .stChatMessage {
-        background-color: rgba(255, 255, 255, 0.03) !important;
+        background-color: rgba(30, 41, 59, 0.5) !important;
         border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        border-radius: 15px !important;
-        backdrop-filter: blur(5px) !important;
-        margin-bottom: 15px;
+        border-radius: 14px !important;
+        backdrop-filter: blur(8px) !important;
+        margin-bottom: 12px;
     }
 
-    /* 7. Sidebar Styling */
+    /* Sidebar Styling */
     [data-testid="stSidebar"] {
-        background-color: rgba(9, 9, 11, 0.95) !important;
+        background-color: #090d16 !important;
         border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
     [data-testid="stSidebar"] * {
         color: #e2e8f0 !important;
     }
     
-    /* Elegant Button Styling in Sidebar */
+    /* Action Button */
     .stButton>button {
-        background: linear-gradient(135deg, #7c3aed 0%, #c026d3 100%) !important;
-        border-radius: 8px !important;
-        border: none !important;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: white !important;
-        font-weight: bold;
+        font-weight: 700;
+        transition: all 0.3s ease;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. App Header (Campus specific text)
-st.markdown('<h1 class="hero-title">Horizon Campus AI</h1>', unsafe_allow_html=True)
-st.markdown('<p class="hero-subtitle">Your Smart Academic Advisor</p>', unsafe_allow_html=True)
-
-# 4. Sidebar
+# 3. Sidebar with Official Logo and Admin Controls
 with st.sidebar:
-    st.markdown("### 🎓 Horizon Admin")
-    st.write("Sync the knowledge base with the Student Handbook.")
+    # Display Logo if available
+    if os.path.exists("logo.png"):
+        st.image("logo.png", width=140)
+    else:
+        st.markdown("### 🎓 Horizon Campus")
+        
+    st.markdown("---")
+    st.markdown("### ⚙️ System Control")
+    st.write("Sync the knowledge base with the official Student Handbook.")
     
-    if st.button("🔄 Sync Database"):
-        with st.spinner("Processing..."):
+    if st.button("🔄 Sync Knowledge Base"):
+        with st.spinner("Processing Handbook..."):
             vector_store = initialize_vector_store("data")
             if vector_store:
-                st.success("✅ Synced Successfully!")
+                st.success("✅ Database Synchronized!")
             else:
-                st.error("❌ No PDFs found.")
+                st.error("❌ No PDF found in 'data'.")
                 
     st.divider()
-    st.markdown("**Ask me about:**\n* 🎓 IT & Law Degrees\n* 📚 Campus Rules\n* 🏫 Library Hours\n* 💰 Fees & Refunds")
+    st.markdown("### 📌 Quick Guide:")
+    st.markdown("""
+    * 🎓 **Degree Programs** (IT, Law, Science)
+    * 📚 **Campus Rules & Regulations**
+    * 🏫 **Library Hours & Services**
+    * 💰 **Fees & Refund Policies**
+    """)
+    st.divider()
+    st.caption("Horizon Campus Agentic AI v2.0")
+
+# 4. App Header with Branding
+st.markdown("""
+    <div class="hero-container">
+        <h1 class="hero-title">Horizon Campus AI Advisor</h1>
+        <p class="hero-subtitle">Official Smart Assistant Powered by Agentic RAG</p>
+    </div>
+""", unsafe_allow_html=True)
 
 # 5. Initialize Chat History
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {"role": "assistant", "content": "Ayubowan! 👋 Welcome to Horizon Campus. I am your official Smart Academic Advisor. How can I assist you with your studies or campus guidelines today?"}
+    ]
 
 # 6. Display Chat Messages
 for message in st.session_state.messages:
@@ -130,14 +148,14 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # 7. User Input Handling
-if user_query := st.chat_input("Ask about degrees, campus rules, or library hours..."):
+if user_query := st.chat_input("Ask about degree programs, library hours, or campus rules..."):
     # Show user message
     st.chat_message("user", avatar="👤").markdown(user_query)
     st.session_state.messages.append({"role": "user", "content": user_query})
 
     # Generate and show assistant response
     with st.chat_message("assistant", avatar="🎓"):
-        with st.spinner("Searching Handbook..."):
+        with st.spinner("Searching Horizon Knowledge Base..."):
             retriever = get_retriever()
             retrieved_context = ""
             
