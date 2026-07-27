@@ -36,8 +36,10 @@ def intent_router_agent(user_query: str) -> dict:
     prompt = PromptTemplate(
         template=(
             "You are an intent router for a Horizon Campus student advisor system. "
-            "Classify the user query into either 'academic_query' (questions about degrees, modules, rules, fees, library) "
-            "or 'general_chat' (greetings, casual talk).\n"
+            "Classify the user query into either 'academic_query' or 'general_chat'.\n\n"
+            "RULES:\n"
+            "- 'academic_query': Use this for ANY question about the campus, including degrees, modules, rules, fees, library, FACILITIES, LOCATIONS, departments, and staff.\n"
+            "- 'general_chat': Use this ONLY for simple greetings (e.g., 'hello', 'hi', 'who are you') or completely off-topic casual small talk.\n\n"
             "Output valid JSON matching this schema:\n{format_instructions}\n"
             "User Query: {query}\n"
         ),
@@ -58,7 +60,7 @@ def academic_advisor_agent(message: dict, retrieved_context: str = "") -> str:
     Agent 2: Academic Advisor providing answers based on RAG context and foundational knowledge.
     """
     if message["intent"] == "general_chat":
-        return "Hello! I am the Horizon Campus Student Advisor AI. Please ask me about degree programs, course modules, or campus rules."
+        return "Hello! I am the Horizon Campus Student Advisor AI. Please ask me about degree programs, campus facilities, course modules, or rules."
     
     prompt = PromptTemplate.from_template(
         "You are a helpful Academic Advisor AI for Horizon Campus students. "
