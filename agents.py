@@ -1,11 +1,17 @@
 import os
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
-from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import JsonOutputParser
+from pydantic import BaseModel, Field
 
-# Load API keys from the .env file
+# Load environment variables from .env
 load_dotenv()
+
+# Define structure for Intent Routing output
+class IntentRoute(BaseModel):
+    intent: str = Field(description="The classified intent: 'academic_query' or 'general_chat'")
+    query: str = Field(description="The cleaned user query")
 
 # 1. Intent Router Model (Groq - Llama 3.1)
 router_model = ChatGroq(
@@ -14,47 +20,53 @@ router_model = ChatGroq(
     temperature=0
 )
 
-# 2. Academic Advisor Model (OpenRouter - GPT-4o-mini or Claude 3.5 Sonnet)
-# Reason: Higher reasoning capability to understand and synthesize complex university rules
-advisor_model = ChatOpenAI(
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    base_url="https://openrouter.ai/api/v1",
-    model="openai/gpt-4o-mini",
+# 2. Academic Advisor Model (OpenRouter or Groq - using Groq for fast execution)
+advisor_model = ChatGroq(
+    groq_api_key=os.getenv("GROQ_API_KEY"),
+    model_name="llama-3.1-8b-instant",
     temperature=0.2
 )
 
 def intent_router_agent(user_query: str) -> dict:
     """
-    Agent responsible for understanding the user's intent (Router Pattern).
+    Agent 1: Routes user queries to determine intent.
     """
-    prompt = PromptTemplate.from_template(
-        "Analyze the following student query and classify the intent into one of two categories: "
-        "'academic_advice' (questions about courses, modules, rules, degrees) or "
-        "'general_chat' (greetings, non-university topics).\n\n"
-        "Query: {query}\n\n"
-        "Return ONLY the category name."
-    )
-    chain = prompt | router_model
-    response = chain.invoke({"query": user_query})
-    intent = response.content.strip().lower()
+    parser = JsonOutputParser(pydantic_object=IntentRoute)
     
-    # Returning a structured message (Agent-to-agent communication)
-    return {"query": user_query, "intent": intent}
+    prompt = PromptTemplate(
+        template=(
+            "You are an intent router for a Horizon Campus student advisor system. "
+            "Classify the user query into either 'academic_query' (questions about degrees, modules, rules, fees, library) "
+            "or 'general_chat' (greetings, casual talk).\n"
+            "Output valid JSON matching this schema:\n{format_instructions}\n"
+            "User Query: {query}\n"
+        ),
+        input_variables=["query"],
+        partial_variables={"format_instructions": parser.get_format_instructions()}
+    )
+    
+    chain = prompt | router_model | parser
+    try:
+        result = chain.invoke({"query": user_query})
+        return result
+    except Exception as e:
+        # Fallback in case of parsing issues
+        return {"intent": "academic_query", "query": user_query}
 
 def academic_advisor_agent(message: dict, retrieved_context: str = "") -> str:
     """
-    Agent responsible for providing academic advice (Orchestrator-Worker Pattern).
+    Agent 2: Academic Advisor providing answers based on RAG context.
     """
     if message["intent"] == "general_chat":
         return "Hello! I am the Horizon Campus Student Advisor AI. Please ask me about degree programs, course modules, or campus rules."
     
     prompt = PromptTemplate.from_template(
         "You are a helpful Academic Advisor AI for Horizon Campus students. "
-        "Use ONLY the following retrieved context from the student handbooks to answer the query. "
-        "If the answer is not in the context, say 'I cannot find this information in the campus guidelines.'\n\n"
+        "Use the following retrieved context from the student handbooks to answer the query accurately. "
+        "If the specific details are not fully in the context, use your general knowledge about Horizon Campus based on the text or politely guide the student.\n\n"
         "Context: {context}\n\n"
         "Student Query: {query}\n\n"
-        "Answer professionally and clearly:"
+        "Answer professionally and clearly based on the handbook data:"
     )
     chain = prompt | advisor_model
     response = chain.invoke({"query": message["query"], "context": retrieved_context})
@@ -62,12 +74,8 @@ def academic_advisor_agent(message: dict, retrieved_context: str = "") -> str:
 
 def orchestrator(user_query: str, retrieved_context: str = "") -> str:
     """
-    Main function to control the communication between the two agents.
+    Orchestrator pattern combining Router and Advisor agents.
     """
-    # 1. Route the query to determine intent
     structured_message = intent_router_agent(user_query)
-    
-    # 2. Pass the structured message to the advisor agent
-    final_answer = academic_advisor_agent(structured_message, retrieved_context)
-    
-    return final_answer
+    final_response = academic_advisor_agent(structured_message, retrieved_context)
+    return final_response
