@@ -6,7 +6,7 @@ from agents import orchestrator
 # 1. Page Configuration
 st.set_page_config(page_title="Horizon Campus AI Advisor", page_icon="🎓", layout="centered", initial_sidebar_state="expanded")
 
-# 2. Premium Custom CSS matching Horizon Campus Brand Colors
+# 2. Premium Custom CSS
 st.markdown("""
     <style>
     /* Hide Streamlit default headers and footers */
@@ -27,10 +27,10 @@ st.markdown("""
     /* Header Banner Styling */
     .hero-container {
         text-align: center;
-        padding: 20px 0;
+        padding: 5px 0 15px 0;
     }
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2.3rem;
         font-weight: 800;
         color: #ffffff;
         margin-top: 10px;
@@ -38,11 +38,17 @@ st.markdown("""
         letter-spacing: -0.02em;
     }
     .hero-subtitle {
-        font-size: 1.05rem;
+        font-size: 1rem;
         color: #94a3b8;
         margin-top: 5px;
-        margin-bottom: 25px;
+        margin-bottom: 10px;
         font-weight: 400;
+    }
+
+    /* Modern Rounded Corners for Images */
+    .stImage img {
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     }
 
     /* Glassmorphism Chat Input */
@@ -96,15 +102,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Sidebar with Official Logo and Admin Controls
+# 3. Sidebar with Admin Controls
 with st.sidebar:
-    # Display Logo if available
-    if os.path.exists("logo.png"):
-        st.image("logo.png", width=140)
-    else:
-        st.markdown("### 🎓 Horizon Campus")
-        
-    st.markdown("---")
     st.markdown("### ⚙️ System Control")
     st.write("Sync the knowledge base with the official Student Handbook.")
     
@@ -127,7 +126,17 @@ with st.sidebar:
     st.divider()
     st.caption("Horizon Campus Agentic AI v2.0")
 
-# 4. App Header with Branding
+# 4. Perfectly Centered Logo
+col1, col2, col3 = st.columns([2, 1, 2])
+with col2:
+    if os.path.exists("logo.png"):
+        st.image("logo.png", use_container_width=True)
+
+# 5. Campus Building Image Banner
+if os.path.exists("building.jpg"):
+    st.image("building.jpg", use_container_width=True)
+
+# 6. App Header Branding
 st.markdown("""
     <div class="hero-container">
         <h1 class="hero-title">Horizon Campus AI Advisor</h1>
@@ -135,25 +144,23 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 5. Initialize Chat History
+# 7. Initialize Chat History
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "assistant", "content": "Ayubowan! 👋 Welcome to Horizon Campus. I am your official Smart Academic Advisor. How can I assist you with your studies or campus guidelines today?"}
     ]
 
-# 6. Display Chat Messages
+# 8. Display Chat Messages
 for message in st.session_state.messages:
     avatar = "🎓" if message["role"] == "assistant" else "👤"
     with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
-# 7. User Input Handling
+# 9. User Input Handling
 if user_query := st.chat_input("Ask about degree programs, library hours, or campus rules..."):
-    # Show user message
     st.chat_message("user", avatar="👤").markdown(user_query)
     st.session_state.messages.append({"role": "user", "content": user_query})
 
-    # Generate and show assistant response
     with st.chat_message("assistant", avatar="🎓"):
         with st.spinner("Searching Horizon Knowledge Base..."):
             retriever = get_retriever()
