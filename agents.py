@@ -7,11 +7,10 @@ from langchain_core.prompts import PromptTemplate
 # Load API keys from the .env file
 load_dotenv()
 
-# 1. Intent Router Model (Groq - Llama 3)
-# Reason: Extremely fast and cost-effective, ideal for simple routing tasks
+# 1. Intent Router Model (Groq - Llama 3.1)
 router_model = ChatGroq(
     groq_api_key=os.getenv("GROQ_API_KEY"),
-    model_name="llama3-8b-8192",
+    model_name="llama-3.1-8b-instant",
     temperature=0
 )
 
