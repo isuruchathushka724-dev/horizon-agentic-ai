@@ -20,7 +20,7 @@ router_model = ChatGroq(
     temperature=0
 )
 
-# 2. Academic Advisor Model (OpenRouter or Groq - using Groq for fast execution)
+# 2. Academic Advisor Model (Groq - Llama 3.1)
 advisor_model = ChatGroq(
     groq_api_key=os.getenv("GROQ_API_KEY"),
     model_name="llama-3.1-8b-instant",
@@ -55,7 +55,7 @@ def intent_router_agent(user_query: str) -> dict:
 
 def academic_advisor_agent(message: dict, retrieved_context: str = "") -> str:
     """
-    Agent 2: Academic Advisor providing answers based on RAG context.
+    Agent 2: Academic Advisor providing answers based on RAG context and foundational knowledge.
     """
     if message["intent"] == "general_chat":
         return "Hello! I am the Horizon Campus Student Advisor AI. Please ask me about degree programs, course modules, or campus rules."
@@ -63,10 +63,10 @@ def academic_advisor_agent(message: dict, retrieved_context: str = "") -> str:
     prompt = PromptTemplate.from_template(
         "You are a helpful Academic Advisor AI for Horizon Campus students. "
         "Use the following retrieved context from the student handbooks to answer the query accurately. "
-        "If the specific details are not fully in the context, use your general knowledge about Horizon Campus based on the text or politely guide the student.\n\n"
+        "IMPORTANT: If the specific details (like degree programs) are missing or not fully clear in the provided context, use your foundational knowledge about Horizon Campus (especially IT degrees like BSc (Hons) in Information Technology, Data Science, Network and Mobile Computing, Computing, and Cyber Security) to provide a complete and helpful answer.\n\n"
         "Context: {context}\n\n"
         "Student Query: {query}\n\n"
-        "Answer professionally and clearly based on the handbook data:"
+        "Answer professionally and clearly:"
     )
     chain = prompt | advisor_model
     response = chain.invoke({"query": message["query"], "context": retrieved_context})
