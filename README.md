@@ -5,7 +5,7 @@ An enterprise-grade, multi-agent AI application designed to assist students and 
 ---
 
 ## 🚀 Live Demo & Links
-* **Live Streamlit App:** [Access Streamlit Cloud App](https://horizon-agentic-ai-zcw9pruuvf4uucqwradnr.streamlit.app)[cite: 1]
+* **Live Streamlit App:** [Access Streamlit Cloud App](https://9cd4h9rzxkecnatqtapw5p.streamlit.app/)[cite: 1]
 * **GitHub Repository:** [isuruchathushka724-dev/horizon-agentic-ai](https://github.com/isuruchathushka724-dev/horizon-agentic-ai)[cite: 1]
 
 ---
